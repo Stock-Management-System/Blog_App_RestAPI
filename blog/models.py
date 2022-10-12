@@ -18,7 +18,7 @@ class BlogPost(models.Model):
         ("p", "PUBLISHED"),
     )
     title = models.CharField(max_length=100)
-    author = models.ForeignKey(User, related_name="post_user", on_delete=models.CASCADE)
+    author = models.ForeignKey(User, related_name="post_user", on_delete=models.PROTECT, default= 'Anonymous User')
     category = models.ForeignKey(Category, related_name="post_category", on_delete=models.CASCADE)
     content = models.TextField()
     # image = models.ImageField(upload_to=None, height_field=None, width_field=None, max_length=None)
@@ -43,7 +43,7 @@ class Like(models.Model):
 class Comment(models.Model):
     content = models.TextField()
     time_stamp = models.DateTimeField(auto_now_add=True, blank=True)
-    user = models.ForeignKey(User, related_name="comment_user", on_delete=models.PROTECT)
+    user = models.ForeignKey(User, related_name="comment_user", on_delete=models.PROTECT, default= 'Anonymous User')
     post = models.ForeignKey(BlogPost, related_name="comment_post", on_delete=models.CASCADE)
 
     def __str__(self):
@@ -51,6 +51,6 @@ class Comment(models.Model):
 
 
 class Post_view(models.Model):
-    user = models.ForeignKey(User, related_name="post_viewed_user", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="post_viewed_user", on_delete=models.PROTECT)
     post = models.ForeignKey(BlogPost, related_name="viewed_post", on_delete=models.CASCADE)
     viewed_date_time = models.DateTimeField(auto_now_add=True, blank=True)
