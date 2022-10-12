@@ -1,5 +1,9 @@
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.db import models
 from django.conf import settings
+from django.template.defaultfilters import slugify
+from blog.api.utils import get_random_code
 
 
 User = settings.AUTH_USER_MODEL
@@ -26,10 +30,14 @@ class BlogPost(models.Model):
     published_date = models.DateTimeField(auto_now_add=True, blank=True)
     last_updated_date = models.DateTimeField(auto_now=True, blank=True)
     status = models.CharField(max_length=2, choices=STATUS)
-    slug = models.SlugField(blank=True, unique=True)
+    slug = models.SlugField(blank=True, null=True)
 
     def __str__(self):
         return self.title
+
+    # def save(self, *args, **kwargs):
+    #     self.slug = slugify(self.title + " " + get_random_code())
+    #     super().save(*args, **kwargs)
 
 
 class Like(models.Model):
@@ -51,6 +59,16 @@ class Comment(models.Model):
 
 
 class Post_view(models.Model):
-    user = models.ForeignKey(User, related_name="post_viewed_user", on_delete=models.PROTECT)
-    post = models.ForeignKey(BlogPost, related_name="viewed_post", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, related_name="post_viewed_user", on_delete=models.PROTECT)
+    post = models.ForeignKey(
+        BlogPost, related_name="viewed_post", on_delete=models.CASCADE)
     viewed_date_time = models.DateTimeField(auto_now_add=True, blank=True)
+
+
+
+
+# @receiver(pre_save, sender=BlogPost)
+# def pre_save_create_slug(sender, instance, **kwargs):
+#     if not instance.slug:
+#         instance.slug = slugify(instance.title + " " + get_random_code())

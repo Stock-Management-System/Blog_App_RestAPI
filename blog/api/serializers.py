@@ -23,13 +23,14 @@ class BlogPostSerializer(serializers.ModelSerializer):
         model = BlogPost
         fields = (
             "id",
+            "title",
             "author",
             "category_id",
             "category",
             "content",
             "image",
             "published_date",
-            "updated_date",
+            "last_updated_date",
             "status",
             "like_count",
             "comment_count",
