@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "rest_framework",
     'rest_framework.authtoken',
     'dj_rest_auth',
-    
+
     # my apps
     "blog",
     "users",
@@ -140,4 +140,8 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.CursorPagination',
     # 'PAGE_SIZE': 3
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination'
+}
+
+REST_AUTH_SERIALIZERS = {
+    'TOKEN_SERIALIZER': 'users.api.serializers.CustomTokenSerializer',
 }
