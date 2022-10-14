@@ -1,6 +1,9 @@
+from rest_framework import permissions
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework import  generics, status
+from blog.api.pagination import CustomLimitOffsetPagination
+from blog.api.permissions import IsAdminUserOrReadOnly, IsPostOwnerOrReadOnly
 from blog.api.serializers import BlogPostSerializer, CategorySerializer, CommentSerializer,LikeSerializer
 from rest_framework.response import Response
 from blog.models import BlogPost, Category, Post_view, Comment, Like
@@ -15,18 +18,21 @@ class CursorSetPagination(CursorPagination):
 class CategoryView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminUserOrReadOnly]
 
 
 class BlogPostView(generics.ListCreateAPIView):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
-    pagination_class = CursorSetPagination
+    pagination_class = CustomLimitOffsetPagination
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class BlogPostDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
     lookup_field = "slug"
+    permission_classes = [IsPostOwnerOrReadOnly]
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -40,6 +46,7 @@ class BlogPostDetailView(generics.RetrieveUpdateDestroyAPIView):
 class CommentView(generics.CreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         print(self.kwargs)
