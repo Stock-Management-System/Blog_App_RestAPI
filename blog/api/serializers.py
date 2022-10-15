@@ -15,6 +15,8 @@ User = get_user_model()
 #             "profile_pic",
 #             "biography"
 #         )
+
+
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -26,7 +28,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    user = serializers.StringRelatedField(read_only=True)
     user_id = serializers.IntegerField()
     post = serializers.StringRelatedField()
     post_id = serializers.IntegerField()
@@ -40,6 +42,7 @@ class LikeSerializer(serializers.ModelSerializer):
     # like_user = AllUserSerializer(many=True, read_only=True)
     user = serializers.StringRelatedField()
     user_id = serializers.IntegerField()
+
     class Meta:
         model = Like
         fields = (
@@ -93,10 +96,3 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
     def get_post_view_count(self, obj):
         return Post_view.objects.filter(post=obj.id).count()
-
-
-class LikeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Like
-        fields = "__all__"

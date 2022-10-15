@@ -7,13 +7,7 @@ from blog.api.permissions import IsAdminUserOrReadOnly, IsPostOwnerOrReadOnly
 from blog.api.serializers import BlogPostSerializer, CategorySerializer, CommentSerializer,LikeSerializer
 from rest_framework.response import Response
 from blog.models import BlogPost, Category, Post_view, Comment, Like
-from rest_framework.pagination import CursorPagination
 
-
-class CursorSetPagination(CursorPagination):
-    page_size = 2
-    page_size_query_param = 'page_size'
-    ordering = 'id'  # '-created' is default
 
 class CategoryView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
