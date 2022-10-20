@@ -59,6 +59,8 @@ class BlogPostSerializer(serializers.ModelSerializer):
     like_post = LikeSerializer(many=True, read_only=True)
     # category = serializers.StringRelatedField()
     # category_id = serializers.IntegerField()
+    author = serializers.StringRelatedField()
+    author_id = serializers.IntegerField()
     like_count = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
     post_view_count = serializers.SerializerMethodField()
@@ -69,6 +71,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "author",
+            "author_id",
             # "category_id",
             "category",
             "content",
@@ -81,11 +84,14 @@ class BlogPostSerializer(serializers.ModelSerializer):
             "comment_count",
             "post_view_count",
             "comment_post",
-            "like_post"
+            "like_post",
         )
         read_only_fields = (
             "published_date",
             "updated_date",
+            "slug",
+            "author",
+            "author_id"
         )
 
     def get_like_count(self, obj):
