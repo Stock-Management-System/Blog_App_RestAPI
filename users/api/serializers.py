@@ -32,6 +32,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         # model = settings.AUTH_USER_MODEL
         fields = (
+            "id",
             "username",
             "email",
             "first_name",
@@ -70,6 +71,7 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             "username",
+            "id",
             "email",
             "first_name",
             "last_name",
@@ -83,6 +85,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             "username",
+            "id",
             "email",
             "first_name",
             "last_name",
