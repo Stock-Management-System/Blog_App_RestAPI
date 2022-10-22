@@ -777,9 +777,22 @@ class BlogConfig(AppConfig):
 ```python
 from rest_framework import serializers
 from blog.models import BlogPost, Category, Comment, Like, Post_view
+from users.api.serializers import UserSerializer
 from django.contrib.auth import get_user_model
-
+# User = settings.AUTH_USER_MODEL
 User = get_user_model()
+
+# class AllUserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model  = User
+#         fields = (
+#             "username",
+#             "first_name",
+#             "last_name",
+#             "profile_pic",
+#             "biography"
+#         )
+
 
 class CategorySerializer(serializers.ModelSerializer):
 
@@ -792,15 +805,25 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)
-    user_id = serializers.IntegerField()
-    post = serializers.StringRelatedField()
-    post_id = serializers.IntegerField()
+    # user = serializers.StringRelatedField(read_only=True)
+    # user_id = serializers.IntegerField()
+    # post = serializers.StringRelatedField()
+    # post_id = serializers.IntegerField()
 
+    # class Meta:
+    #     model = Comment
+    #     fields = "__all__"
+
+# kimin yorum yaptığını belirtmek için ilave edildi
+    user = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Comment
-        fields = "__all__"
-
+        fields = (
+            "id",
+            "content",
+            "time_stamp",
+            "user",
+        )
 
 class LikeSerializer(serializers.ModelSerializer):
     # like_user = AllUserSerializer(many=True, read_only=True)
@@ -823,6 +846,8 @@ class BlogPostSerializer(serializers.ModelSerializer):
     like_post = LikeSerializer(many=True, read_only=True)
     # category = serializers.StringRelatedField()
     # category_id = serializers.IntegerField()
+    author = serializers.StringRelatedField()
+    author_id = serializers.IntegerField()
     like_count = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
     post_view_count = serializers.SerializerMethodField()
@@ -833,6 +858,8 @@ class BlogPostSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "author",
+            "author_id",
+            # "category_id",
             "category",
             "content",
             "image",
@@ -844,13 +871,14 @@ class BlogPostSerializer(serializers.ModelSerializer):
             "comment_count",
             "post_view_count",
             "comment_post",
-            "like_post"
+            "like_post",
         )
         read_only_fields = (
             "published_date",
             "updated_date",
+            "slug",
             "author",
-            "slug"
+            "author_id"
         )
 
     def get_like_count(self, obj):
@@ -889,6 +917,8 @@ class BlogPostView(generics.ListCreateAPIView):
     pagination_class = CustomLimitOffsetPagination
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 class BlogPostDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BlogPost.objects.all()
@@ -915,11 +945,11 @@ class CommentView(generics.CreateAPIView):
         slug = self.kwargs.get('slug')
         blog = get_object_or_404(BlogPost, slug=slug)
         user = self.request.user
-        comments = Comment.objects.filter(blog=blog, user=user)
+        comments = Comment.objects.filter(post=blog, user=user)
         if comments.exists():
             raise ValidationError(
                 "You can not add another comment, for this Post !")
-        serializer.save(blog=blog, user=user)
+        serializer.save(post=blog, user=user)
 
 
 class LikeView(generics.ListCreateAPIView):

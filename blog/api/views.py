@@ -49,11 +49,11 @@ class CommentView(generics.CreateAPIView):
         slug = self.kwargs.get('slug')
         blog = get_object_or_404(BlogPost, slug=slug)
         user = self.request.user
-        comments = Comment.objects.filter(blog=blog, user=user)
+        comments = Comment.objects.filter(post=blog, user=user)
         if comments.exists():
             raise ValidationError(
                 "You can not add another comment, for this Post !")
-        serializer.save(blog=blog, user=user)
+        serializer.save(post=blog, user=user)
 
 
 class LikeView(generics.ListCreateAPIView):
