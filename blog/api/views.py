@@ -61,10 +61,10 @@ class LikeView(generics.ListCreateAPIView):
     serializer_class = LikeSerializer
 
     def create(self, request, *args, **kwargs):
-        user = request.data.get('user')
+        user = request.data.get('user_id')
         post = request.data.get('post')
         serializer = self.get_serializer(data=request.data)
-        exists_like = Like.objects.filter(user=user, post=post)
+        exists_like = Like.objects.filter(user_id=user, post=post)
         serializer.is_valid(raise_exception=True)
         if exists_like:
             exists_like.delete()

@@ -844,10 +844,10 @@ class LikeSerializer(serializers.ModelSerializer):
 class BlogPostSerializer(serializers.ModelSerializer):
     comment_post = CommentSerializer(many=True, read_only=True)
     like_post = LikeSerializer(many=True, read_only=True)
-    # category = serializers.StringRelatedField()
-    # category_id = serializers.IntegerField()
-    author = serializers.StringRelatedField()
-    author_id = serializers.IntegerField()
+    category = serializers.StringRelatedField(read_only=True)
+    category_id = serializers.IntegerField()
+    author = serializers.StringRelatedField(read_only=True)
+    author_id = serializers.IntegerField(read_only=True)
     like_count = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
     post_view_count = serializers.SerializerMethodField()
@@ -859,7 +859,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
             "title",
             "author",
             "author_id",
-            # "category_id",
+            "category_id",
             "category",
             "content",
             "image",
@@ -877,8 +877,6 @@ class BlogPostSerializer(serializers.ModelSerializer):
             "published_date",
             "updated_date",
             "slug",
-            "author",
-            "author_id"
         )
 
     def get_like_count(self, obj):
@@ -889,6 +887,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
     def get_post_view_count(self, obj):
         return Post_view.objects.filter(post=obj.id).count()
+
 ```
 
 ## 🚩 Go to "api/views.py" under blog app 👇
@@ -933,8 +932,6 @@ class BlogPostDetailView(generics.RetrieveUpdateDestroyAPIView):
         Post_view.objects.create(user=request.user, post=instance)
         return Response(serializer.data)
 
-
-
 class CommentView(generics.CreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -957,10 +954,10 @@ class LikeView(generics.ListCreateAPIView):
     serializer_class = LikeSerializer
 
     def create(self, request, *args, **kwargs):
-        user = request.data.get('user')
+        user = request.data.get('user_id')
         post = request.data.get('post')
         serializer = self.get_serializer(data=request.data)
-        exists_like = Like.objects.filter(user=user, post=post)
+        exists_like = Like.objects.filter(user_id=user, post=post)
         serializer.is_valid(raise_exception=True)
         if exists_like:
             exists_like.delete()
