@@ -37,7 +37,7 @@ class CommentSerializer(serializers.ModelSerializer):
     #     model = Comment
     #     fields = "__all__"
 
-# kimin yorum yaptığını belirtmek için ilave edildi
+#! added to indicate who commented
     user = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Comment

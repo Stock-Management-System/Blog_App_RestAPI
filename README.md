@@ -782,18 +782,6 @@ from django.contrib.auth import get_user_model
 # User = settings.AUTH_USER_MODEL
 User = get_user_model()
 
-# class AllUserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model  = User
-#         fields = (
-#             "username",
-#             "first_name",
-#             "last_name",
-#             "profile_pic",
-#             "biography"
-#         )
-
-
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -805,16 +793,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    # user = serializers.StringRelatedField(read_only=True)
-    # user_id = serializers.IntegerField()
-    # post = serializers.StringRelatedField()
-    # post_id = serializers.IntegerField()
 
-    # class Meta:
-    #     model = Comment
-    #     fields = "__all__"
-
-# kimin yorum yaptığını belirtmek için ilave edildi
+#! added to indicate who commented
     user = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Comment
@@ -1018,9 +998,35 @@ urlpatterns = [
 ]
 ```
 
+## 🚩 Create "userAllPost" so that a user can see their own created posts in one place in "blog/api/views.py" 👇
+
+```python
+class UserAllPosts(generics.ListAPIView):
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogPostSerializer
+    permission_classes = [IsPostOwnerOrReadOnly]
+
+    def get_queryset(self):
+        author = self.request.user
+        queryset = BlogPost.objects.filter(author=author)
+        return queryset
+```
+
+## 🚩 Update the BlogPostView()'s "queryset" 👇
+
+```python
+    queryset = BlogPost.objects.filter(status="p")
+```
+
+## 🚩 Add "all-posts" path to "urls.py" in "blog/api/" 👇
+
+```python
+    path("all-posts/", UserAllPosts.as_view()),
+```
+
 ## 📢 Do not forget to check the endpoints you wrote in [Postman](https://www.postman.com/).
 
-## <center>🥳 END OF THE  BACKEND 🥳</center>
+## <center>🥳 END OF THE BACKEND 🥳</center>
 
 <hr>
 
@@ -1165,4 +1171,4 @@ python manage.py runserver
 yarn start
 ```
 
-## <center> ****************************************************** </center>
+<hr>
