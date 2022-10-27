@@ -16,13 +16,23 @@ class CategoryView(generics.ListCreateAPIView):
 
 
 class BlogPostView(generics.ListCreateAPIView):
-    queryset = BlogPost.objects.all()
+    queryset = BlogPost.objects.filter(status="p")
     serializer_class = BlogPostSerializer
     pagination_class = CustomLimitOffsetPagination
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+class UserAllPosts(generics.ListAPIView):
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogPostSerializer
+    permission_classes = [IsPostOwnerOrReadOnly]
+
+    def get_queryset(self):
+        author = self.request.user
+        queryset = BlogPost.objects.filter(author=author)
+        return queryset
 
 class BlogPostDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BlogPost.objects.all()
