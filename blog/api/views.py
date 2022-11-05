@@ -18,7 +18,7 @@ class CategoryView(generics.ListCreateAPIView):
 class BlogPostView(generics.ListCreateAPIView):
     queryset = BlogPost.objects.filter(status="p")
     serializer_class = BlogPostSerializer
-    pagination_class = CustomLimitOffsetPagination
+   // pagination_class = CustomLimitOffsetPagination
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
